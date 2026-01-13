@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube subscriptions</title>
+    <link rel="icon" href="https://www.youtube.com/s/desktop/99388d96/img/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="https://www.youtube.com/s/desktop/99388d96/img/favicon_32x32.png" sizes="32x32">
+    <link rel="icon" href="https://www.youtube.com/s/desktop/99388d96/img/favicon_96x96.png" sizes="96x96">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #181818;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            width: 100vw;
+        }
+        .header-container {
+            display: flex;
+            justify-content: flex-end; /* Align right */
+            align-items: center;
+            padding: 15px 30px;
+            background-color: #202020;
+            border-bottom: 1px solid #383838;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        /* No H1 as requested */
+        
+        .refresh-btn {
+            background-color: #3ea6ff;
+            color: #181818;
+            padding: 8px 16px;
+            border-radius: 2px; /* Square-ish Material look */
+            text-decoration: none;
+            font-size: 1.2rem; /* Larger for emoji */
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .refresh-btn:hover {
+            background-color: #65b8ff;
+        }
+
+        /* Toggle Switch CSS */
+        .dim-toggle-container {
+            display: flex;
+            align-items: center;
+            color: #aaaaaa;
+            font-size: 0.9rem;
+        }
+        .dim-toggle-container span {
+            font-size: 1.2rem; /* Match refresh button size */
+            margin-right: 8px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            /* margin-right removed */
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #555;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #3ea6ff;
+        }
+        input:focus + .slider {
+            box-shadow: 0 0 1px #3ea6ff;
+        }
+        input:checked + .slider:before {
+            -webkit-transform: translateX(20px);
+            -ms-transform: translateX(20px);
+            transform: translateX(20px);
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+        }
+        .flash-messages {
+            text-align: center;
+            padding: 10px;
+            position: absolute;
+            width: 100%;
+            top: 60px;
+            pointer-events: none;
+        }
+        .flash {
+            background-color: #2b2b2b;
+            color: #ffffff;
+            border: 1px solid #3ea6ff;
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            pointer-events: auto;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+            padding: 30px;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        .video-card {
+            background: #202020;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s;
+            cursor: pointer;
+            height: 100%; /* Ensure full height */
+        }
+        .video-card:hover {
+            transform: scale(1.02);
+            z-index: 10;
+        }
+        .thumbnail-container {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        }
+        .thumbnail-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .info {
+            padding: 12px 10px 10px 0; /* YouTube style padding */
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .title {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #ffffff;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.4;
+        }
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+        .channel {
+            font-size: 0.85rem;
+            color: #aaaaaa;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 8px;
+            flex-grow: 1;
+        }
+        .date {
+            display: none; /* Hide date */
+        }
+        .watch-later-btn {
+            text-decoration: none;
+            background: none;
+            border: none;
+            font-size: 1.3rem; /* Slightly smaller to fit line */
+            line-height: 1;
+            padding: 2px;
+            cursor: pointer;
+            color: #aaaaaa;
+            opacity: 0; /* Hidden until hover */
+            transition: opacity 0.2s, color 0.2s;
+            flex-shrink: 0;
+        }
+        .video-card:hover .watch-later-btn {
+            opacity: 1;
+        }
+        .watch-later-btn:hover {
+            color: #3ea6ff;
+        }
+
+        /* Seen video dimming */
+        /* Only apply if body has 'dimming-enabled' class */
+        body.dimming-enabled .video-card.seen {
+            opacity: 0.6;
+            filter: grayscale(30%);
+            transition: opacity 0.3s, filter 0.3s;
+        }
+        body.dimming-enabled .video-card.seen:hover {
+            opacity: 1;
+            filter: grayscale(0%);
+        }
+
+        /* Favorite Filter Logic */
+        body.fav-filter-enabled .video-card:not(.is-favorite) {
+            display: none;
+        }
+        
+        /* Toast notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 30px;
+            font-size: 17px;
+            border: 1px solid #3ea6ff;
+        }
+
+        #toast.show {
+            visibility: visible;
+            -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @-webkit-keyframes fadein {
+            from {bottom: 0; opacity: 0;} 
+            to {bottom: 30px; opacity: 1;}
+        }
+
+        @keyframes fadein {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+
+        @-webkit-keyframes fadeout {
+            from {bottom: 30px; opacity: 1;} 
+            to {bottom: 0; opacity: 0;}
+        }
+
+        @keyframes fadeout {
+            from {bottom: 30px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        @media (max-width: 1400px) {
+
+            .grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+        @media (max-width: 1100px) {
+            .grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="controls">
+            <div class="dim-toggle-container" style="margin-right: 20px;">
+                <span>⭐</span>
+                <label class="switch">
+                    <input type="checkbox" id="favToggle">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="dim-toggle-container" style="margin-right: 20px;">
+                <span>👁️</span>
+                <label class="switch">
+                    <input type="checkbox" id="dimToggle" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            
+            <a href="{{ url_for('index', refresh='true') }}" class="refresh-btn" style="background-color: transparent; color: #3ea6ff;" title="Actualizar">🔄</a>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toast">Saved to 'Watch Later (yt-s)'</div>
+
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="flash">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+    </div>
+
+    {% if videos %}
+    <div class="grid">
+        {% for video in videos %}
+        <div class="video-card {{ 'is-favorite' if video.channelTitle in favs else '' }}" data-video-id="{{ video.id }}">
+            <a href="https://www.youtube.com/watch?v={{ video.id }}" target="_blank">
+                <div class="thumbnail-container">
+                    <img src="{{ video.thumbnail }}" alt="{{ video.title }}">
+                </div>
+            </a>
+            <div class="info">
+                <a href="https://www.youtube.com/watch?v={{ video.id }}" target="_blank">
+                    <div class="title" title="{{ video.title }}">{{ video.title }}</div>
+                </a>
+                <div class="meta-row">
+                    <div class="channel" title="{{ video.channelTitle }}">{{ video.channelTitle }}</div>
+                    <button class="watch-later-btn" title="Add to Watch Later" onclick="addToWatchLater('{{ video.id }}', this)">
+                        🕒
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 20px;">
+        <p>No se encontraron videos recientes o aún no has iniciado sesión.</p>
+        <p><a href="{{ url_for('login') }}">Iniciar Sesión con Google</a></p>
+    </div>
+    {% endif %}
+
+    <script>
+        function addToWatchLater(videoId, btn) {
+            btn.style.opacity = '0.5';
+            btn.style.pointerEvents = 'none';
+            
+            fetch('/watch-later/' + videoId, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        btn.innerHTML = '✅';
+                        btn.style.opacity = '1';
+                        showToast("Added to 'Watch Later (yt-s)'");
+                    } else {
+                        btn.innerHTML = '❌';
+                        btn.style.opacity = '1';
+                        /* Use the message from server if possible, but keep it short */
+                        showToast("Error al agregar");
+                        console.error(data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    btn.innerHTML = '❌';
+                    showToast("Error de conexión");
+                });
+        }
+
+        function showToast(message) {
+            var x = document.getElementById("toast");
+            x.textContent = message;
+            x.className = "show";
+            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+        }
+
+        /* Logic to dim seen videos */
+        document.addEventListener('DOMContentLoaded', () => {
+            // -- Toggle Logic for Dimming --
+            const dimToggle = document.getElementById('dimToggle');
+            const body = document.body;
+
+            // Load preference (default to true/enabled)
+            const dimmingPref = localStorage.getItem('yts_dimming_enabled');
+            const isDimEnabled = dimmingPref === null || dimmingPref === 'true';
+
+            dimToggle.checked = isDimEnabled;
+            if (isDimEnabled) {
+                body.classList.add('dimming-enabled');
+            } else {
+                body.classList.remove('dimming-enabled');
+            }
+
+            // Listen for changes
+            dimToggle.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    body.classList.add('dimming-enabled');
+                    localStorage.setItem('yts_dimming_enabled', 'true');
+                } else {
+                    body.classList.remove('dimming-enabled');
+                    localStorage.setItem('yts_dimming_enabled', 'false');
+                }
+            });
+
+            // -- Toggle Logic for Favorites --
+            const favToggle = document.getElementById('favToggle');
+            const grid = document.querySelector('.grid');
+            
+            // Load preference
+            const favPref = localStorage.getItem('yts_fav_filter_enabled');
+            const isFavEnabled = favPref === 'true';
+            
+            // Helper to apply filter
+            function applyFavFilter(enabled) {
+                if (enabled) {
+                    body.classList.add('fav-filter-enabled');
+                } else {
+                    body.classList.remove('fav-filter-enabled');
+                }
+            }
+
+            if (favToggle) {
+                favToggle.checked = isFavEnabled;
+                applyFavFilter(isFavEnabled);
+
+                favToggle.addEventListener('change', (e) => {
+                    applyFavFilter(e.target.checked);
+                    localStorage.setItem('yts_fav_filter_enabled', e.target.checked);
+                });
+            }
+
+            // -- Seen Video Logic --
+            const seenVideos = new Set(JSON.parse(localStorage.getItem('yts_seen_ids') || '[]'));
+            const cards = document.querySelectorAll('.video-card');
+
+            // Apply 'seen' class initially to those already in storage
+            cards.forEach(card => {
+                const vid = card.getAttribute('data-video-id');
+                if (seenVideos.has(vid)) {
+                    card.classList.add('seen');
+                }
+
+                // Logic for Long Press (Tablet/Touch) to Watch Later
+                let pressTimer;
+                const startPress = (e) => {
+                    // Do not block default interaction immediately so user can still scroll/click
+                    pressTimer = setTimeout(() => {
+                        const btn = card.querySelector('.watch-later-btn');
+                        if (btn) {
+                            // Visual feedback
+                            if (navigator.vibrate) navigator.vibrate(50);
+                            card.style.transform = "scale(0.95)";
+                            setTimeout(() => card.style.transform = "scale(1.02)", 150);
+                            setTimeout(() => card.style.transform = "", 300);
+                            
+                            // Trigger logic
+                            addToWatchLater(vid, btn);
+                        }
+                    }, 600); // 600ms hold time
+                };
+                
+                const cancelPress = () => {
+                    clearTimeout(pressTimer);
+                };
+
+                // Touch events
+                card.addEventListener('touchstart', startPress, {passive: true});
+                card.addEventListener('touchend', cancelPress);
+                card.addEventListener('touchmove', cancelPress); // Cancel if scrolling
+                
+                // Mouse events (for desktop testing or hybrid devices)
+                card.addEventListener('mousedown', startPress);
+                card.addEventListener('mouseup', cancelPress);
+                card.addEventListener('mouseleave', cancelPress);
+            });
+
+            // IntersectionObserver to mark new ones as seen when scrolled into view
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    // Check if element is leaving the view (scrolling past it)
+                    // We check if it is NOT intersecting, but WAS visible previously.
+                    // However, IntersectionObserver logic is simpler:
+                    // If entry.isIntersecting => User is seeing it NOW.
+                    // Ideally, we mark it seen once it has been fully engaged (1.0 threshold), 
+                    // AND then we apply the visual dimming ONLY when it leaves the screen again 
+                    // (so it doesn't dim while you are staring at it).
+
+                    // Logic:
+                    // 1. If (isIntersecting && 100% visible) -> Mark as "seen" in data (but not visual yet)
+                    // 2. If (!isIntersecting && boundingClientRect.top < 0) -> It scrolled UP (passed). Apply visual class.
+
+                    const card = entry.target;
+                    const vid = card.getAttribute('data-video-id');
+
+                    if (entry.isIntersecting) {
+                        // It is on screen fully
+                        if (vid && !seenVideos.has(vid)) {
+                            seenVideos.add(vid);
+                            localStorage.setItem('yts_seen_ids', JSON.stringify(Array.from(seenVideos)));
+                            // Mark a flag on the element itself so we know it has been "watched" this session
+                            card.dataset.hasBeenSeen = "true";
+                        }
+                    } else {
+                        // It is NOT on screen. 
+                        // If it has been seen this session (flag true) AND it is now off-screen:
+                        // Apply the visual class immediately so if they scroll back up, it is dimmed.
+                        if (card.dataset.hasBeenSeen === "true") {
+                            card.classList.add('seen');
+                        }
+                    }
+                });
+            }, {
+                threshold: 1.0 // Trigger when 100% of the card is visible
+            });
+
+            cards.forEach(card => observer.observe(card));
+        });
+    </script>
+</body>
+</html>
