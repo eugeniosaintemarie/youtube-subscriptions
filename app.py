@@ -208,7 +208,7 @@ def add_to_watch_later(video_id):
         return jsonify({'success': False, 'message': 'Auth required'}), 401
         
     try:
-        target_title = "Ver más tarde (App)"
+        target_title = "Watch later (yt-s)"
         playlist_id = None
         
         req = youtube.playlists().list(
@@ -253,7 +253,7 @@ def add_to_watch_later(video_id):
                 }
             }
         ).execute()
-        return jsonify({'success': True, 'message': 'Agregado a playlist'})
+        return jsonify({'success': True, 'message': 'Saved'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 

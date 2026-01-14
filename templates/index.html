@@ -14,12 +14,12 @@
             color: #ffffff;
             margin: 0;
             padding: 0;
-            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-x: hidden;
             width: 100vw;
         }
         .header-container {
             display: flex;
-            justify-content: flex-end; /* Align right */
+            justify-content: flex-end;
             align-items: center;
             padding: 15px 30px;
             background-color: #202020;
@@ -28,15 +28,14 @@
             top: 0;
             z-index: 100;
         }
-        /* No H1 as requested */
         
         .refresh-btn {
             background-color: #3ea6ff;
             color: #181818;
             padding: 8px 16px;
-            border-radius: 2px; /* Square-ish Material look */
+            border-radius: 2px;
             text-decoration: none;
-            font-size: 1.2rem; /* Larger for emoji */
+            font-size: 1.2rem;
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -49,7 +48,6 @@
             background-color: #65b8ff;
         }
 
-        /* Toggle Switch CSS */
         .dim-toggle-container {
             display: flex;
             align-items: center;
@@ -57,7 +55,7 @@
             font-size: 0.9rem;
         }
         .dim-toggle-container span {
-            font-size: 1.2rem; /* Match refresh button size */
+            font-size: 1.2rem;
             margin-right: 8px;
         }
         .switch {
@@ -65,7 +63,6 @@
             display: inline-block;
             width: 40px;
             height: 20px;
-            /* margin-right removed */
         }
         .switch input { 
             opacity: 0;
@@ -148,7 +145,7 @@
             flex-direction: column;
             transition: transform 0.2s;
             cursor: pointer;
-            height: 100%; /* Ensure full height */
+            height: 100%;
         }
         .video-card:hover {
             transform: scale(1.02);
@@ -157,7 +154,7 @@
         .thumbnail-container {
             position: relative;
             width: 100%;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            padding-top: 56.25%;
         }
         .thumbnail-container img {
             position: absolute;
@@ -168,7 +165,7 @@
             object-fit: cover;
         }
         .info {
-            padding: 12px 10px 10px 0; /* YouTube style padding */
+            padding: 12px 10px 10px 0;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
@@ -201,18 +198,18 @@
             flex-grow: 1;
         }
         .date {
-            display: none; /* Hide date */
+            display: none;
         }
         .watch-later-btn {
             text-decoration: none;
             background: none;
             border: none;
-            font-size: 1.3rem; /* Slightly smaller to fit line */
+            font-size: 1.3rem;
             line-height: 1;
             padding: 2px;
             cursor: pointer;
             color: #aaaaaa;
-            opacity: 0; /* Hidden until hover */
+            opacity: 0;
             transition: opacity 0.2s, color 0.2s;
             flex-shrink: 0;
         }
@@ -223,8 +220,6 @@
             color: #3ea6ff;
         }
 
-        /* Seen video dimming */
-        /* Only apply if body has 'dimming-enabled' class */
         body.dimming-enabled .video-card.seen {
             opacity: 0.6;
             filter: grayscale(30%);
@@ -235,12 +230,10 @@
             filter: grayscale(0%);
         }
 
-        /* Favorite Filter Logic */
         body.fav-filter-enabled .video-card:not(.is-favorite) {
             display: none;
         }
         
-        /* Toast notification */
         #toast {
             visibility: hidden;
             min-width: 250px;
@@ -335,7 +328,6 @@
         </div>
     </div>
 
-    <!-- Toast container -->
     <div id="toast">Saved to 'Watch Later (yt-s)'</div>
 
     <div class="flash-messages">
@@ -363,7 +355,7 @@
                 </a>
                 <div class="meta-row">
                     <div class="channel" title="{{ video.channelTitle }}">{{ video.channelTitle }}</div>
-                    <button class="watch-later-btn" title="Add to Watch Later" onclick="addToWatchLater('{{ video.id }}', this)">
+                    <button class="watch-later-btn" title="Saved" onclick="addToWatchLater('{{ video.id }}', this)">
                         🕒
                     </button>
                 </div>
@@ -389,19 +381,18 @@
                     if (data.success) {
                         btn.innerHTML = '✅';
                         btn.style.opacity = '1';
-                        showToast("Added to 'Watch Later (yt-s)'");
+                        showToast("Saved");
                     } else {
                         btn.innerHTML = '❌';
                         btn.style.opacity = '1';
-                        /* Use the message from server if possible, but keep it short */
-                        showToast("Error al agregar");
+                        showToast("Error");
                         console.error(data.message);
                     }
                 })
                 .catch(err => {
                     console.error(err);
                     btn.innerHTML = '❌';
-                    showToast("Error de conexión");
+                    showToast("Connection error");
                 });
         }
 
@@ -412,13 +403,10 @@
             setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
         }
 
-        /* Logic to dim seen videos */
         document.addEventListener('DOMContentLoaded', () => {
-            // -- Toggle Logic for Dimming --
             const dimToggle = document.getElementById('dimToggle');
             const body = document.body;
 
-            // Load preference (default to true/enabled)
             const dimmingPref = localStorage.getItem('yts_dimming_enabled');
             const isDimEnabled = dimmingPref === null || dimmingPref === 'true';
 
@@ -429,7 +417,6 @@
                 body.classList.remove('dimming-enabled');
             }
 
-            // Listen for changes
             dimToggle.addEventListener('change', (e) => {
                 if (e.target.checked) {
                     body.classList.add('dimming-enabled');
@@ -440,15 +427,12 @@
                 }
             });
 
-            // -- Toggle Logic for Favorites --
             const favToggle = document.getElementById('favToggle');
             const grid = document.querySelector('.grid');
             
-            // Load preference
             const favPref = localStorage.getItem('yts_fav_filter_enabled');
             const isFavEnabled = favPref === 'true';
             
-            // Helper to apply filter
             function applyFavFilter(enabled) {
                 if (enabled) {
                     body.classList.add('fav-filter-enabled');
@@ -467,88 +451,62 @@
                 });
             }
 
-            // -- Seen Video Logic --
             const seenVideos = new Set(JSON.parse(localStorage.getItem('yts_seen_ids') || '[]'));
             const cards = document.querySelectorAll('.video-card');
 
-            // Apply 'seen' class initially to those already in storage
             cards.forEach(card => {
                 const vid = card.getAttribute('data-video-id');
                 if (seenVideos.has(vid)) {
                     card.classList.add('seen');
                 }
 
-                // Logic for Long Press (Tablet/Touch) to Watch Later
                 let pressTimer;
                 const startPress = (e) => {
-                    // Do not block default interaction immediately so user can still scroll/click
                     pressTimer = setTimeout(() => {
                         const btn = card.querySelector('.watch-later-btn');
                         if (btn) {
-                            // Visual feedback
                             if (navigator.vibrate) navigator.vibrate(50);
                             card.style.transform = "scale(0.95)";
                             setTimeout(() => card.style.transform = "scale(1.02)", 150);
                             setTimeout(() => card.style.transform = "", 300);
                             
-                            // Trigger logic
                             addToWatchLater(vid, btn);
                         }
-                    }, 600); // 600ms hold time
+                    }, 600);
                 };
                 
                 const cancelPress = () => {
                     clearTimeout(pressTimer);
                 };
 
-                // Touch events
                 card.addEventListener('touchstart', startPress, {passive: true});
                 card.addEventListener('touchend', cancelPress);
-                card.addEventListener('touchmove', cancelPress); // Cancel if scrolling
+                card.addEventListener('touchmove', cancelPress);
                 
-                // Mouse events (for desktop testing or hybrid devices)
                 card.addEventListener('mousedown', startPress);
                 card.addEventListener('mouseup', cancelPress);
                 card.addEventListener('mouseleave', cancelPress);
             });
 
-            // IntersectionObserver to mark new ones as seen when scrolled into view
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    // Check if element is leaving the view (scrolling past it)
-                    // We check if it is NOT intersecting, but WAS visible previously.
-                    // However, IntersectionObserver logic is simpler:
-                    // If entry.isIntersecting => User is seeing it NOW.
-                    // Ideally, we mark it seen once it has been fully engaged (1.0 threshold), 
-                    // AND then we apply the visual dimming ONLY when it leaves the screen again 
-                    // (so it doesn't dim while you are staring at it).
-
-                    // Logic:
-                    // 1. If (isIntersecting && 100% visible) -> Mark as "seen" in data (but not visual yet)
-                    // 2. If (!isIntersecting && boundingClientRect.top < 0) -> It scrolled UP (passed). Apply visual class.
-
                     const card = entry.target;
                     const vid = card.getAttribute('data-video-id');
 
                     if (entry.isIntersecting) {
-                        // It is on screen fully
                         if (vid && !seenVideos.has(vid)) {
                             seenVideos.add(vid);
                             localStorage.setItem('yts_seen_ids', JSON.stringify(Array.from(seenVideos)));
-                            // Mark a flag on the element itself so we know it has been "watched" this session
                             card.dataset.hasBeenSeen = "true";
                         }
                     } else {
-                        // It is NOT on screen. 
-                        // If it has been seen this session (flag true) AND it is now off-screen:
-                        // Apply the visual class immediately so if they scroll back up, it is dimmed.
                         if (card.dataset.hasBeenSeen === "true") {
                             card.classList.add('seen');
                         }
                     }
                 });
             }, {
-                threshold: 1.0 // Trigger when 100% of the card is visible
+                threshold: 1.0
             });
 
             cards.forEach(card => observer.observe(card));
