@@ -7,108 +7,103 @@
     <link rel="icon" href="https://www.youtube.com/s/desktop/99388d96/img/favicon.ico" type="image/x-icon">
     <link rel="icon" href="https://www.youtube.com/s/desktop/99388d96/img/favicon_32x32.png" sizes="32x32">
     <link rel="icon" href="https://www.youtube.com/s/desktop/99388d96/img/favicon_96x96.png" sizes="96x96">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
+        *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #181818;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #0f0f0f;
+            color: #f1f1f1;
             overflow-x: hidden;
             width: 100vw;
+            min-height: 100vh;
         }
+
         .header-container {
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            padding: 15px 30px;
-            background-color: #202020;
-            border-bottom: 1px solid #383838;
+            padding: 12px 24px;
+            background: rgba(15,15,15,.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,.06);
             position: sticky;
             top: 0;
             z-index: 100;
-        }
-        
-        .refresh-btn {
-            background-color: #3ea6ff;
-            color: #181818;
-            padding: 8px 16px;
-            border-radius: 2px;
-            text-decoration: none;
-            font-size: 1.2rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: background-color 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .refresh-btn:hover {
-            background-color: #65b8ff;
-        }
-
-        .dim-toggle-container {
-            display: flex;
-            align-items: center;
-            color: #aaaaaa;
-            font-size: 0.9rem;
-        }
-        .dim-toggle-container span {
-            font-size: 1.2rem;
-            margin-right: 8px;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 20px;
-        }
-        .switch input { 
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #555;
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 20px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 14px;
-            width: 14px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #3ea6ff;
-        }
-        input:focus + .slider {
-            box-shadow: 0 0 1px #3ea6ff;
-        }
-        input:checked + .slider:before {
-            -webkit-transform: translateX(20px);
-            -ms-transform: translateX(20px);
-            transform: translateX(20px);
         }
 
         .controls {
             display: flex;
             align-items: center;
+            gap: 6px;
         }
+
+        .ctrl-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: #888;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: background .2s, color .2s;
+            text-decoration: none;
+        }
+        .ctrl-icon:hover { background: rgba(255,255,255,.08); color: #fff; }
+        .ctrl-icon.active { color: #3ea6ff; }
+
+        .separator {
+            width: 1px;
+            height: 24px;
+            background: rgba(255,255,255,.1);
+            margin: 0 4px;
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: #3a3a3a;
+            border-radius: 20px;
+            transition: background .3s;
+        }
+        .slider::before {
+            content: '';
+            position: absolute;
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform .3s;
+        }
+        input:checked + .slider { background: #3ea6ff; }
+        input:checked + .slider::before { transform: translateX(16px); }
+
+        #favToggle + .slider::before { transform: translateX(16px); }
+        #favToggle:checked + .slider::before { transform: translateX(0); }
+
         .flash-messages {
             text-align: center;
             padding: 10px;
@@ -118,63 +113,95 @@
             pointer-events: none;
         }
         .flash {
-            background-color: #2b2b2b;
-            color: #ffffff;
-            border: 1px solid #3ea6ff;
+            background: rgba(62,166,255,.12);
+            color: #f1f1f1;
+            border: 1px solid rgba(62,166,255,.3);
             display: inline-block;
             padding: 10px 20px;
-            border-radius: 4px;
+            border-radius: 8px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 24px rgba(0,0,0,.3);
             pointer-events: auto;
+            backdrop-filter: blur(8px);
         }
+
+        #toast {
+            visibility: hidden;
+            min-width: 220px;
+            margin-left: -110px;
+            background: rgba(30,30,30,.92);
+            color: #fff;
+            text-align: center;
+            border-radius: 12px;
+            padding: 14px 22px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 30px;
+            font-size: .95rem;
+            border: 1px solid rgba(62,166,255,.25);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,.4);
+        }
+        #toast.show {
+            visibility: visible;
+            animation: fadein .4s ease, fadeout .4s 2.6s ease;
+        }
+        @keyframes fadein  { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+        @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+
         .grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 20px;
-            padding: 30px;
-            max-width: 100%;
-            box-sizing: border-box;
+            gap: 18px;
+            padding: 24px;
         }
+
         .video-card {
-            background: #202020;
-            border-radius: 0;
-            box-shadow: none;
+            background: transparent;
+            border-radius: 12px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: transform 0.2s;
+            transition: transform .2s ease, box-shadow .2s ease;
             cursor: pointer;
             height: 100%;
         }
         .video-card:hover {
-            transform: scale(1.02);
+            transform: translateY(-4px);
             z-index: 10;
         }
+
         .thumbnail-container {
             position: relative;
             width: 100%;
             padding-top: 56.25%;
+            border-radius: 12px;
+            overflow: hidden;
         }
         .thumbnail-container img {
             position: absolute;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform .3s ease;
         }
+        .video-card:hover .thumbnail-container img {
+            transform: scale(1.04);
+        }
+
         .info {
-            padding: 12px 10px 10px 0;
+            padding: 10px 4px 8px;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
         }
         .title {
-            font-size: 1rem;
+            font-size: .9rem;
             font-weight: 500;
-            margin-bottom: 6px;
-            color: #ffffff;
+            margin-bottom: 4px;
+            color: #f1f1f1;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -189,146 +216,98 @@
             margin-top: auto;
         }
         .channel {
-            font-size: 0.85rem;
-            color: #aaaaaa;
+            font-size: .8rem;
+            color: #aaa;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             margin-right: 8px;
             flex-grow: 1;
         }
-        .date {
-            display: none;
-        }
+        .date { display: none; }
+
         .watch-later-btn {
-            text-decoration: none;
             background: none;
             border: none;
-            font-size: 1.3rem;
-            line-height: 1;
-            padding: 2px;
+            font-size: 1.1rem;
+            padding: 4px;
             cursor: pointer;
-            color: #aaaaaa;
+            color: #aaa;
             opacity: 0;
-            transition: opacity 0.2s, color 0.2s;
+            transition: opacity .2s, color .2s, transform .15s;
             flex-shrink: 0;
         }
-        .video-card:hover .watch-later-btn {
-            opacity: 1;
-        }
-        .watch-later-btn:hover {
-            color: #3ea6ff;
-        }
+        .video-card:hover .watch-later-btn { opacity: 1; }
+        .watch-later-btn:hover { color: #3ea6ff; transform: scale(1.15); }
 
         body.dimming-enabled .video-card.seen {
-            opacity: 0.6;
-            filter: grayscale(30%);
-            transition: opacity 0.3s, filter 0.3s;
+            opacity: .5;
+            filter: grayscale(40%);
+            transition: opacity .3s, filter .3s;
         }
         body.dimming-enabled .video-card.seen:hover {
             opacity: 1;
             filter: grayscale(0%);
         }
 
-        body.fav-filter-enabled .video-card:not(.is-favorite) {
-            display: none;
-        }
-        
-        #toast {
-            visibility: hidden;
-            min-width: 250px;
-            margin-left: -125px;
-            background-color: #333;
-            color: #fff;
+        body.fav-filter-enabled .video-card:not(.is-favorite) { display: none; }
+        body.exclude-fav-enabled .video-card.is-favorite { display: none; }
+
+        a { text-decoration: none; color: inherit; }
+
+        .empty-state {
             text-align: center;
-            border-radius: 4px;
-            padding: 16px;
-            position: fixed;
-            z-index: 1000;
-            left: 50%;
-            bottom: 30px;
-            font-size: 17px;
-            border: 1px solid #3ea6ff;
+            padding: 60px 20px;
+            color: #888;
         }
+        .empty-state i { font-size: 3rem; margin-bottom: 16px; display: block; color: #555; }
+        .empty-state a { color: #3ea6ff; }
+        .empty-state a:hover { text-decoration: underline; }
 
-        #toast.show {
-            visibility: visible;
-            -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-            animation: fadein 0.5s, fadeout 0.5s 2.5s;
-        }
-
-        @-webkit-keyframes fadein {
-            from {bottom: 0; opacity: 0;} 
-            to {bottom: 30px; opacity: 1;}
-        }
-
-        @keyframes fadein {
-            from {bottom: 0; opacity: 0;}
-            to {bottom: 30px; opacity: 1;}
-        }
-
-        @-webkit-keyframes fadeout {
-            from {bottom: 30px; opacity: 1;} 
-            to {bottom: 0; opacity: 0;}
-        }
-
-        @keyframes fadeout {
-            from {bottom: 30px; opacity: 1;}
-            to {bottom: 0; opacity: 0;}
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-        
-        @media (max-width: 1400px) {
-
-            .grid {
-                grid-template-columns: repeat(5, 1fr);
-            }
-        }
-        @media (max-width: 1100px) {
-            .grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        @media (max-width: 900px) {
-            .grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        @media (max-width: 600px) {
-            .grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
+        @media (max-width: 1400px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+        @media (max-width: 1100px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 900px)  { .grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 600px)  { .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; } }
     </style>
 </head>
 <body>
     <div class="header-container">
         <div class="controls">
-            <div class="dim-toggle-container" style="margin-right: 20px;">
-                <span>⭐</span>
+            <div class="toggle-group">
+                <button class="ctrl-icon" id="favIcon" title="Solo favoritos">
+                    <i class="fa-solid fa-star"></i>
+                </button>
                 <label class="switch">
                     <input type="checkbox" id="favToggle">
-                    <span class="slider round"></span>
+                    <span class="slider"></span>
                 </label>
             </div>
 
-            <div class="dim-toggle-container" style="margin-right: 20px;">
-                <span>👁️</span>
+            <button class="ctrl-icon" id="excludeFavBtn" title="Ocultar favoritos (ver el resto)">
+                <i class="fa-solid fa-eye-slash"></i>
+            </button>
+
+            <div class="separator"></div>
+
+            <div class="toggle-group">
+                <button class="ctrl-icon" id="dimIcon" title="Atenuar vistos">
+                    <i class="fa-solid fa-circle-half-stroke"></i>
+                </button>
                 <label class="switch">
                     <input type="checkbox" id="dimToggle" checked>
-                    <span class="slider round"></span>
+                    <span class="slider"></span>
                 </label>
             </div>
-            
-            <a href="{{ url_for('index', refresh='true') }}" class="refresh-btn" style="background-color: transparent; color: #3ea6ff;" title="Actualizar">🔄</a>
+
+            <div class="separator"></div>
+
+            <a href="{{ url_for('index', refresh='true') }}" class="ctrl-icon" title="Actualizar">
+                <i class="fa-solid fa-rotate-right"></i>
+            </a>
         </div>
     </div>
 
-    <div id="toast">Saved to 'Watch Later (yt-s)'</div>
+    <div id="toast"></div>
 
     <div class="flash-messages">
         {% with messages = get_flashed_messages() %}
@@ -346,7 +325,7 @@
         <div class="video-card {{ 'is-favorite' if video.channelTitle in favs else '' }}" data-video-id="{{ video.id }}">
             <a href="https://www.youtube.com/watch?v={{ video.id }}" target="_blank">
                 <div class="thumbnail-container">
-                    <img src="{{ video.thumbnail }}" alt="{{ video.title }}">
+                    <img src="{{ video.thumbnail }}" alt="{{ video.title }}" loading="lazy">
                 </div>
             </a>
             <div class="info">
@@ -355,8 +334,8 @@
                 </a>
                 <div class="meta-row">
                     <div class="channel" title="{{ video.channelTitle }}">{{ video.channelTitle }}</div>
-                    <button class="watch-later-btn" title="Saved" onclick="addToWatchLater('{{ video.id }}', this)">
-                        🕒
+                    <button class="watch-later-btn" title="Watch Later" onclick="addToWatchLater('{{ video.id }}', this)">
+                        <i class="fa-regular fa-clock"></i>
                     </button>
                 </div>
             </div>
@@ -364,7 +343,8 @@
         {% endfor %}
     </div>
     {% else %}
-    <div style="text-align: center; padding: 20px;">
+    <div class="empty-state">
+        <i class="fa-solid fa-video-slash"></i>
         <p>No se encontraron videos recientes o aún no has iniciado sesión.</p>
         <p><a href="{{ url_for('login') }}">Iniciar Sesión con Google</a></p>
     </div>
@@ -374,115 +354,142 @@
         function addToWatchLater(videoId, btn) {
             btn.style.opacity = '0.5';
             btn.style.pointerEvents = 'none';
-            
+
             fetch('/watch-later/' + videoId, { method: 'POST' })
-                .then(response => response.json())
+                .then(r => r.json())
                 .then(data => {
                     if (data.success) {
-                        btn.innerHTML = '✅';
+                        btn.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#4caf50"></i>';
                         btn.style.opacity = '1';
-                        showToast("Saved");
+                        showToast('Saved');
                     } else {
-                        btn.innerHTML = '❌';
+                        btn.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color:#f44336"></i>';
                         btn.style.opacity = '1';
-                        showToast("Error");
+                        showToast('Error');
                         console.error(data.message);
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    btn.innerHTML = '❌';
-                    showToast("Connection error");
+                    btn.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color:#f44336"></i>';
+                    showToast('Connection error');
                 });
         }
 
         function showToast(message) {
-            var x = document.getElementById("toast");
-            x.textContent = message;
-            x.className = "show";
-            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+            const t = document.getElementById('toast');
+            t.textContent = message;
+            t.className = 'show';
+            setTimeout(() => { t.className = ''; }, 3000);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const dimToggle = document.getElementById('dimToggle');
             const body = document.body;
+
+            const dimToggle = document.getElementById('dimToggle');
+            const dimIcon   = document.getElementById('dimIcon');
 
             const dimmingPref = localStorage.getItem('yts_dimming_enabled');
             const isDimEnabled = dimmingPref === null || dimmingPref === 'true';
 
             dimToggle.checked = isDimEnabled;
-            if (isDimEnabled) {
-                body.classList.add('dimming-enabled');
-            } else {
-                body.classList.remove('dimming-enabled');
-            }
+            if (isDimEnabled) body.classList.add('dimming-enabled');
 
-            dimToggle.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    body.classList.add('dimming-enabled');
-                    localStorage.setItem('yts_dimming_enabled', 'true');
-                } else {
-                    body.classList.remove('dimming-enabled');
-                    localStorage.setItem('yts_dimming_enabled', 'false');
-                }
+            function syncDimIcon() {
+                dimIcon.classList.toggle('active', dimToggle.checked);
+            }
+            syncDimIcon();
+
+            dimToggle.addEventListener('change', () => {
+                body.classList.toggle('dimming-enabled', dimToggle.checked);
+                localStorage.setItem('yts_dimming_enabled', dimToggle.checked);
+                syncDimIcon();
             });
 
             const favToggle = document.getElementById('favToggle');
-            const grid = document.querySelector('.grid');
-            
+            const favIcon   = document.getElementById('favIcon');
+            const excludeFavBtn = document.getElementById('excludeFavBtn');
+
             const favPref = localStorage.getItem('yts_fav_filter_enabled');
             const isFavEnabled = favPref === 'true';
-            
-            function applyFavFilter(enabled) {
-                if (enabled) {
-                    body.classList.add('fav-filter-enabled');
-                } else {
-                    body.classList.remove('fav-filter-enabled');
-                }
+
+            const exclPref = localStorage.getItem('yts_exclude_fav_enabled');
+            const isExclEnabled = exclPref === 'true';
+
+            function applyFilters() {
+                body.classList.toggle('fav-filter-enabled', favToggle.checked);
+                body.classList.toggle('exclude-fav-enabled', excludeFavBtn.classList.contains('active'));
+            }
+
+            function syncFavIcons() {
+                favIcon.classList.toggle('active', favToggle.checked);
             }
 
             if (favToggle) {
                 favToggle.checked = isFavEnabled;
-                applyFavFilter(isFavEnabled);
+                syncFavIcons();
 
-                favToggle.addEventListener('change', (e) => {
-                    applyFavFilter(e.target.checked);
-                    localStorage.setItem('yts_fav_filter_enabled', e.target.checked);
+                if (isExclEnabled && !isFavEnabled) {
+                    excludeFavBtn.classList.add('active');
+                }
+
+                applyFilters();
+
+                favToggle.addEventListener('change', () => {
+                    if (favToggle.checked) {
+                        excludeFavBtn.classList.remove('active');
+                        localStorage.setItem('yts_exclude_fav_enabled', 'false');
+                    }
+                    localStorage.setItem('yts_fav_filter_enabled', favToggle.checked);
+                    syncFavIcons();
+                    applyFilters();
+                });
+
+                favIcon.addEventListener('click', () => {
+                    favToggle.checked = !favToggle.checked;
+                    favToggle.dispatchEvent(new Event('change'));
                 });
             }
+
+            excludeFavBtn.addEventListener('click', () => {
+                const willActivate = !excludeFavBtn.classList.contains('active');
+                excludeFavBtn.classList.toggle('active', willActivate);
+
+                if (willActivate && favToggle.checked) {
+                    favToggle.checked = false;
+                    localStorage.setItem('yts_fav_filter_enabled', 'false');
+                    syncFavIcons();
+                }
+
+                localStorage.setItem('yts_exclude_fav_enabled', willActivate);
+                applyFilters();
+            });
 
             const seenVideos = new Set(JSON.parse(localStorage.getItem('yts_seen_ids') || '[]'));
             const cards = document.querySelectorAll('.video-card');
 
             cards.forEach(card => {
                 const vid = card.getAttribute('data-video-id');
-                if (seenVideos.has(vid)) {
-                    card.classList.add('seen');
-                }
+                if (seenVideos.has(vid)) card.classList.add('seen');
 
                 let pressTimer;
-                const startPress = (e) => {
+                const startPress = () => {
                     pressTimer = setTimeout(() => {
                         const btn = card.querySelector('.watch-later-btn');
                         if (btn) {
                             if (navigator.vibrate) navigator.vibrate(50);
-                            card.style.transform = "scale(0.95)";
-                            setTimeout(() => card.style.transform = "scale(1.02)", 150);
-                            setTimeout(() => card.style.transform = "", 300);
-                            
+                            card.style.transform = 'scale(0.95)';
+                            setTimeout(() => card.style.transform = 'translateY(-4px)', 150);
+                            setTimeout(() => card.style.transform = '', 300);
                             addToWatchLater(vid, btn);
                         }
                     }, 600);
                 };
-                
-                const cancelPress = () => {
-                    clearTimeout(pressTimer);
-                };
+                const cancelPress = () => clearTimeout(pressTimer);
 
-                card.addEventListener('touchstart', startPress, {passive: true});
+                card.addEventListener('touchstart', startPress, { passive: true });
                 card.addEventListener('touchend', cancelPress);
                 card.addEventListener('touchmove', cancelPress);
-                
                 card.addEventListener('mousedown', startPress);
                 card.addEventListener('mouseup', cancelPress);
                 card.addEventListener('mouseleave', cancelPress);
@@ -496,18 +503,14 @@
                     if (entry.isIntersecting) {
                         if (vid && !seenVideos.has(vid)) {
                             seenVideos.add(vid);
-                            localStorage.setItem('yts_seen_ids', JSON.stringify(Array.from(seenVideos)));
-                            card.dataset.hasBeenSeen = "true";
+                            localStorage.setItem('yts_seen_ids', JSON.stringify([...seenVideos]));
+                            card.dataset.hasBeenSeen = 'true';
                         }
-                    } else {
-                        if (card.dataset.hasBeenSeen === "true") {
-                            card.classList.add('seen');
-                        }
+                    } else if (card.dataset.hasBeenSeen === 'true') {
+                        card.classList.add('seen');
                     }
                 });
-            }, {
-                threshold: 1.0
-            });
+            }, { threshold: 1.0 });
 
             cards.forEach(card => observer.observe(card));
         });

@@ -208,7 +208,7 @@ def add_to_watch_later(video_id):
         return jsonify({'success': False, 'message': 'Auth required'}), 401
         
     try:
-        target_title = "Watch later (yt-s)"
+        target_title = "0 Watch"
         playlist_id = None
         
         req = youtube.playlists().list(
