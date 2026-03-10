@@ -267,7 +267,7 @@
         body.fav-filter-enabled .video-card:not(.is-favorite) { display: none; }
         body.exclude-fav-enabled .video-card.is-favorite { display: none; }
 
-        a { text-decoration: none; color: inherit; }
+        a { text-decoration: none; color: inherit; user-select: none; -webkit-user-select: none; }
 
         .empty-state {
             text-align: center;
@@ -400,9 +400,15 @@
         document.addEventListener('DOMContentLoaded', () => {
             const body = document.body;
 
-            // Prevenir drag de imágenes
+            // Prevenir drag de imágenes y popup de enlaces
             document.querySelectorAll('.thumbnail-container img').forEach(img => {
                 img.addEventListener('dragstart', (e) => e.preventDefault());
+            });
+            
+            // Prevenir popup de URL en enlaces
+            document.querySelectorAll('.video-card a').forEach(link => {
+                link.addEventListener('contextmenu', (e) => e.preventDefault());
+                link.addEventListener('longpress', (e) => e.preventDefault());
             });
 
             const dimToggle = document.getElementById('dimToggle');
