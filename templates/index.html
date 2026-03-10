@@ -196,6 +196,10 @@
             height: 100%;
             object-fit: cover;
             transition: transform .3s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            pointer-events: none;
         }
         .video-card:hover .thumbnail-container img {
             transform: scale(1.04);
@@ -395,6 +399,11 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const body = document.body;
+
+            // Prevenir drag de imágenes
+            document.querySelectorAll('.thumbnail-container img').forEach(img => {
+                img.addEventListener('dragstart', (e) => e.preventDefault());
+            });
 
             const dimToggle = document.getElementById('dimToggle');
             const dimIcon   = document.getElementById('dimIcon');
