@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const decodeBasicHeader = (value: string): string | null => {
+  try {
+    return atob(value);
+  } catch {
+    return null;
+  }
+};
+
 const isBypassedPath = (pathname: string): boolean => {
   return (
     pathname.startsWith("/_next") ||
@@ -29,7 +37,14 @@ export function middleware(request: NextRequest) {
   }
 
   const encoded = authHeader.split(" ")[1];
-  const decoded = Buffer.from(encoded, "base64").toString("utf-8");
+  const decoded = decodeBasicHeader(encoded);
+  if (!decoded) {
+    return new NextResponse("Invalid credentials", {
+      status: 401,
+      headers: { "WWW-Authenticate": 'Basic realm="Private App"' }
+    });
+  }
+
   const [username, password] = decoded.split(":");
 
   if (username !== expectedUser || password !== expectedPass) {
