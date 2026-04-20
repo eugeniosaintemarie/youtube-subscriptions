@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { consumeOAuthState, exchangeCodeForTokens } from "@/lib/auth";
-import { getBaseUrl } from "@/lib/env";
 
 const OAUTH_STATE_COOKIE = "oauth_state";
 
@@ -31,9 +30,10 @@ export async function GET(request: NextRequest) {
     return response;
   }
 
-  await exchangeCodeForTokens(code);
+  const callbackUrl = `${request.nextUrl.origin}/api/oauth/callback`;
+  await exchangeCodeForTokens(code, { redirectUri: callbackUrl });
 
-  const response = NextResponse.redirect(new URL("/", getBaseUrl()));
+  const response = NextResponse.redirect(new URL("/", request.nextUrl.origin));
   response.cookies.set({
     name: OAUTH_STATE_COOKIE,
     value: "",

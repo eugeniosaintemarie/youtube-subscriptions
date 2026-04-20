@@ -7,13 +7,21 @@ import type { StoredTokens } from "@/lib/types";
 const TOKENS_KEY = "single_user:oauth_tokens";
 const OAUTH_STATE_PREFIX = "single_user:oauth_state:";
 
-const createOAuthClient = () => {
-  const { clientId, clientSecret, redirectUri } = getOAuthConfig();
-  return new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+const createOAuthClient = (redirectUri?: string) => {
+  const oauthConfig = getOAuthConfig();
+  return new google.auth.OAuth2(
+    oauthConfig.clientId,
+    oauthConfig.clientSecret,
+    redirectUri ?? oauthConfig.redirectUri
+  );
 };
 
-export async function createOAuthUrl(): Promise<string> {
-  const oauth2Client = createOAuthClient();
+type OAuthRuntimeOptions = {
+  redirectUri?: string;
+};
+
+export async function createOAuthUrl(options?: OAuthRuntimeOptions): Promise<string> {
+  const oauth2Client = createOAuthClient(options?.redirectUri);
   const state = randomUUID();
 
   await setJson(`${OAUTH_STATE_PREFIX}${state}`, { createdAt: Date.now() }, 300);
@@ -38,8 +46,11 @@ export async function consumeOAuthState(state: string): Promise<boolean> {
   return true;
 }
 
-export async function exchangeCodeForTokens(code: string): Promise<StoredTokens> {
-  const oauth2Client = createOAuthClient();
+export async function exchangeCodeForTokens(
+  code: string,
+  options?: OAuthRuntimeOptions
+): Promise<StoredTokens> {
+  const oauth2Client = createOAuthClient(options?.redirectUri);
   const tokenResponse = await oauth2Client.getToken(code);
 
   const tokens: StoredTokens = {

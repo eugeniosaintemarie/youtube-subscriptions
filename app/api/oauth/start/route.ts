@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createOAuthUrl } from "@/lib/auth";
 
 const OAUTH_STATE_COOKIE = "oauth_state";
 
-export async function GET() {
-  const requiredEnv = ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GOOGLE_REDIRECT_URI"];
+export async function GET(request: NextRequest) {
+  const requiredEnv = ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"];
   const missing = requiredEnv.filter((name) => !process.env[name]);
 
   if (missing.length > 0) {
@@ -18,7 +18,8 @@ export async function GET() {
   }
 
   try {
-    const authorizationUrl = await createOAuthUrl();
+    const callbackUrl = `${request.nextUrl.origin}/api/oauth/callback`;
+    const authorizationUrl = await createOAuthUrl({ redirectUri: callbackUrl });
     const state = new URL(authorizationUrl).searchParams.get("state");
     if (!state) {
       return NextResponse.json(
