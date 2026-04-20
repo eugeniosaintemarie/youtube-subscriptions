@@ -253,7 +253,7 @@ export default function HomePage() {
         {!isLoading && authRequired ? (
           <div className="empty-state">
             <i className="fa-solid fa-lock" />
-            <p>No hay sesión activa.</p>
+            <p>No hay sesión activa</p>
             <p>
               <a href={loginUrl}>Iniciar sesión con Google</a>
             </p>
