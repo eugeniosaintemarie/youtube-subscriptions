@@ -56,7 +56,7 @@ export default function HomePage() {
 
   const toastTimer = useRef<number | null>(null);
   const longPressTimer = useRef<number | null>(null);
-  const cardRefs = useRef<Map<string, HTMLArticleElement>>(new Map());
+  const cardRefs = useRef<Map<string, HTMLElement>>(new Map());
 
   // Handle OAuth success callback
   useEffect(() => {
@@ -217,7 +217,7 @@ export default function HomePage() {
   }, []);
 
   const setCardRef = useCallback(
-    (videoId: string) => (node: HTMLArticleElement | null) => {
+    (videoId: string) => (node: HTMLElement | null) => {
       if (!node) {
         cardRefs.current.delete(videoId);
         return;
