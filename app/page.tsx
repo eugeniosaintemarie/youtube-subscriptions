@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { AppVideo } from "@/lib/types";
 
 type ApiResponse = {
@@ -56,6 +56,7 @@ export default function HomePage() {
 
   const toastTimer = useRef<number | null>(null);
   const longPressTimer = useRef<number | null>(null);
+  const cardRefs = useRef<Map<string, HTMLArticleElement>>(new Map());
 
   // Handle OAuth success callback
   useEffect(() => {
@@ -202,16 +203,71 @@ export default function HomePage() {
     showToast(data.message ?? "Error", "error");
   };
 
-  const markSeen = (videoId: string) => {
-    if (seenIds.has(videoId)) {
+  const markSeen = useCallback((videoId: string) => {
+    setSeenIds((prev) => {
+      if (prev.has(videoId)) {
+        return prev;
+      }
+
+      const next = new Set(prev);
+      next.add(videoId);
+      localStorage.setItem("yts_seen_ids", JSON.stringify(Array.from(next)));
+      return next;
+    });
+  }, []);
+
+  const setCardRef = useCallback(
+    (videoId: string) => (node: HTMLArticleElement | null) => {
+      if (!node) {
+        cardRefs.current.delete(videoId);
+        return;
+      }
+
+      cardRefs.current.set(videoId, node);
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (visibleVideos.length === 0) {
       return;
     }
 
-    const next = new Set(seenIds);
-    next.add(videoId);
-    setSeenIds(next);
-    localStorage.setItem("yts_seen_ids", JSON.stringify(Array.from(next)));
-  };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) {
+            return;
+          }
+
+          const element = entry.target as HTMLElement;
+          const videoId = element.dataset.videoId;
+          if (!videoId) {
+            return;
+          }
+
+          markSeen(videoId);
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.6 }
+    );
+
+    visibleVideos.forEach((video) => {
+      if (seenIds.has(video.id)) {
+        return;
+      }
+
+      const card = cardRefs.current.get(video.id);
+      if (card) {
+        observer.observe(card);
+      }
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [visibleVideos, seenIds, markSeen]);
 
   const startLongPress = (videoId: string) => {
     longPressTimer.current = window.setTimeout(() => {
@@ -249,11 +305,11 @@ export default function HomePage() {
           <label className="switch inverted" title="Solo favoritos">
             <input
               type="checkbox"
-              checked={!favFilterEnabled}
+              checked={favFilterEnabled}
               onChange={(event) => {
                 const checked = event.target.checked;
-                setFavFilterEnabled(!checked);
-                if (!checked) {
+                setFavFilterEnabled(checked);
+                if (checked) {
                   setExcludeFavEnabled(false);
                 }
               }}
@@ -332,6 +388,8 @@ export default function HomePage() {
               return (
                 <article
                   key={video.id}
+                  ref={setCardRef(video.id)}
+                  data-video-id={video.id}
                   className={`video-card ${dimEnabled && isSeen ? "seen" : ""}`}
                   onMouseDown={() => startLongPress(video.id)}
                   onMouseUp={cancelLongPress}

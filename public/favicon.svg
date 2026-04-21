@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="YouTube Subscriptions">
+  <rect width="192" height="192" rx="36" fill="#3ea6ff" />
+  <path
+    fill="#ffffff"
+    d="M62 72c0-7.7 6.3-14 14-14h40c7.7 0 14 6.3 14 14v48c0 7.7-6.3 14-14 14H76c-7.7 0-14-6.3-14-14V72zm24.5 8.2v31.6L112 96 86.5 80.2z"
+  />
+</svg>
