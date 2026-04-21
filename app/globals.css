@@ -123,6 +123,10 @@ button {
   transform: translateX(16px);
 }
 
+.switch.inverted input:not(:checked) + .slider {
+  background: var(--accent);
+}
+
 .switch.inverted input:checked + .slider::before {
   transform: translateX(0);
 }
