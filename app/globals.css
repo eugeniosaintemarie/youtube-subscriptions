@@ -203,13 +203,9 @@ button {
   border: none;
   background: transparent;
   color: #aaa;
-  opacity: 0;
-  cursor: pointer;
-  transition: opacity 0.2s ease, color 0.2s ease;
-}
-
-.video-card:hover .watch-btn {
   opacity: 1;
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 .watch-btn:hover {

@@ -24,6 +24,23 @@ const getSeenIds = () => {
   }
 };
 
+const getCachedVideos = () => {
+  try {
+    const data = localStorage.getItem("yts_cached_data");
+    return data ? JSON.parse(data) : null;
+  } catch {
+    return null;
+  }
+};
+
+const setCachedVideos = (data: { videos: AppVideo[]; favorites: string[] }) => {
+  try {
+    localStorage.setItem("yts_cached_data", JSON.stringify(data));
+  } catch {
+    // Ignore if localStorage fails
+  }
+};
+
 export default function HomePage() {
   const [videos, setVideos] = useState<AppVideo[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -39,6 +56,16 @@ export default function HomePage() {
 
   const toastTimer = useRef<number | null>(null);
   const longPressTimer = useRef<number | null>(null);
+
+  // Handle OAuth success callback
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("auth_success") === "true") {
+      localStorage.setItem("yts_auth_timestamp", String(Date.now()));
+      // Remove the param from URL
+      window.history.replaceState({}, "", "/");
+    }
+  }, []);
 
   useEffect(() => {
     setDimEnabled(localStorage.getItem("yts_dimming_enabled") !== "false");
@@ -65,34 +92,64 @@ export default function HomePage() {
     const load = async () => {
       setIsLoading(true);
 
-      const response = await fetch(`/api/videos${refreshFlag > 0 ? "?refresh=true" : ""}`, {
-        cache: "no-store"
-      });
+      try {
+        const response = await fetch(`/api/videos${refreshFlag > 0 ? "?refresh=true" : ""}`, {
+          cache: "no-store"
+        });
 
-      const data = (await response.json()) as ApiResponse;
-      if (ignore) {
-        return;
-      }
+        const data = (await response.json()) as ApiResponse;
+        if (ignore) {
+          return;
+        }
 
-      if (response.status === 401 && data.authRequired) {
-        setAuthRequired(true);
-        setLoginUrl(data.loginUrl ?? "/api/oauth/start");
-        setVideos([]);
-        setFavorites([]);
+        if (response.status === 401 && data.authRequired) {
+          // Check if we have cached data to show while offline
+          const cached = getCachedVideos();
+          if (cached) {
+            setVideos(cached.videos);
+            setFavorites(cached.favorites);
+            showToast("Usando datos en caché", "success");
+          } else {
+            setAuthRequired(true);
+            setLoginUrl(data.loginUrl ?? "/api/oauth/start");
+            setVideos([]);
+            setFavorites([]);
+          }
+          setIsLoading(false);
+          return;
+        }
+
+        if (!response.ok) {
+          const cached = getCachedVideos();
+          if (cached) {
+            setVideos(cached.videos);
+            setFavorites(cached.favorites);
+            showToast("Usando datos en caché", "success");
+          } else {
+            showToast(data.error ?? "Error loading videos", "error");
+          }
+          setIsLoading(false);
+          return;
+        }
+
+        setAuthRequired(false);
+        const newData = { videos: data.videos ?? [], favorites: data.favorites ?? [] };
+        setVideos(newData.videos);
+        setFavorites(newData.favorites);
+        setCachedVideos(newData);
         setIsLoading(false);
-        return;
-      }
-
-      if (!response.ok) {
-        showToast(data.error ?? "Error loading videos", "error");
+      } catch (error) {
+        // Network error - try to use cached data
+        const cached = getCachedVideos();
+        if (cached) {
+          setVideos(cached.videos);
+          setFavorites(cached.favorites);
+          showToast("Usando datos en caché (sin conexión)", "success");
+        } else {
+          showToast("Error de conexión", "error");
+        }
         setIsLoading(false);
-        return;
       }
-
-      setAuthRequired(false);
-      setVideos(data.videos ?? []);
-      setFavorites(data.favorites ?? []);
-      setIsLoading(false);
     };
 
     void load();

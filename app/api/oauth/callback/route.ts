@@ -33,7 +33,8 @@ export async function GET(request: NextRequest) {
   const callbackUrl = `${request.nextUrl.origin}/api/oauth/callback`;
   await exchangeCodeForTokens(code, { redirectUri: callbackUrl });
 
-  const response = NextResponse.redirect(new URL("/", request.nextUrl.origin));
+  // Redirect with success indicator for client-side persistence
+  const response = NextResponse.redirect(new URL("/?auth_success=true", request.nextUrl.origin));
   response.cookies.set({
     name: OAUTH_STATE_COOKIE,
     value: "",
