@@ -151,7 +151,40 @@ button {
   background: #fff;
   border-radius: 50%;
   transition: transform 0.3s;
+  transform: translateX(0);
+}
+
+.switch.inverted input:checked + .slider {
+  background: var(--accent);
+}
+
+.switch.inverted input:checked + .slider::before {
   transform: translateX(16px);
+}
+
+.switch.inverted .slider::before {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s;
+  transform: translateX(16px);
+}
+
+.switch.inverted input:checked + .slider::before {
+  transform: translateX(0);
+}
+
+.switch.inverted input:checked + .slider {
+  background: var(--accent);
+}
+
+.switch.inverted input:checked + .slider {
+  background: var(--accent);
 }
 
 .switch.inverted input:checked + .slider {
