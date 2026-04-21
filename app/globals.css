@@ -146,12 +146,11 @@ button {
   position: absolute;
   width: 14px;
   height: 14px;
-  left: 3px;
+  right: 3px;
   bottom: 3px;
   background: #fff;
   border-radius: 50%;
   transition: transform 0.3s;
-  transform: translateX(0);
 }
 
 .switch.inverted input:checked + .slider {
@@ -159,7 +158,7 @@ button {
 }
 
 .switch.inverted input:checked + .slider::before {
-  transform: translateX(16px);
+  transform: translateX(-16px);
 }
 
 .main {
