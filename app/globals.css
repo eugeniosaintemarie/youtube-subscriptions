@@ -136,7 +136,7 @@ button {
   position: absolute;
   inset: 0;
   cursor: pointer;
-  background: var(--accent);
+  background: #3a3a3a;
   border-radius: 20px;
   transition: background 0.3s;
 }
@@ -151,15 +151,15 @@ button {
   background: #fff;
   border-radius: 50%;
   transition: transform 0.3s;
-  transform: translateX(0);
+  transform: translateX(16px);
 }
 
 .switch.inverted input:checked + .slider {
-  background: #3a3a3a;
+  background: var(--accent);
 }
 
 .switch.inverted input:checked + .slider::before {
-  transform: translateX(16px);
+  transform: translateX(0);
 }
 
 .main {
