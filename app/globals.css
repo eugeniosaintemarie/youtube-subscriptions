@@ -119,16 +119,47 @@ button {
   transform: translateX(16px);
 }
 
+.switch.inverted {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+}
+
+.switch.inverted input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch.inverted .slider {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  background: var(--accent);
+  border-radius: 20px;
+  transition: background 0.3s;
+}
+
 .switch.inverted .slider::before {
-  transform: translateX(16px);
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s;
+  transform: translateX(0);
 }
 
 .switch.inverted input:checked + .slider {
-  background: var(--accent);
+  background: #3a3a3a;
 }
 
 .switch.inverted input:checked + .slider::before {
-  transform: translateX(0);
+  transform: translateX(16px);
 }
 
 .main {
