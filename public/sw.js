@@ -1,6 +1,6 @@
 // Service Worker for PWA functionality
-const CACHE_NAME = "yts-cache-v1";
-const STATIC_ASSETS = ["/", "/app/globals.css"];
+const CACHE_NAME = "yts-cache-v2";
+const STATIC_ASSETS = ["/app/globals.css"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -39,15 +39,39 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // For navigation requests (HTML pages), always go to network first
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        // If offline, try cache
+        return caches.match(event.request).then((response) => {
+          return response || new Response("Offline", {
+            status: 503,
+            statusText: "Service Unavailable"
+          });
+        });
+      })
+    );
+    return;
+  }
+
+  // For static assets, use cache first with network fallback
   event.respondWith(
     caches.match(event.request).then((response) => {
       if (response) {
+        // Revalidate in background
+        fetch(event.request).then((response) => {
+          if (response && response.status === 200) {
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, response.clone());
+            });
+          }
+        }).catch(() => {});
         return response;
       }
 
       return fetch(event.request)
         .then((response) => {
-          // Don't cache non-2xx responses
           if (!response || response.status !== 200) {
             return response;
           }
@@ -60,7 +84,6 @@ self.addEventListener("fetch", (event) => {
           return response;
         })
         .catch(() => {
-          // Return a generic offline response if available
           return new Response("Offline", {
             status: 503,
             statusText: "Service Unavailable"
