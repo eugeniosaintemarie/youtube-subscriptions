@@ -362,19 +362,7 @@ export default function HomePage() {
 
           <div className="separator" />
 
-          <button className="ctrl-icon" title="Actualizar" onClick={() => {
-            clearVideoCache();
-            if ('serviceWorker' in navigator) {
-              caches.keys().then((names) => {
-                names.forEach((name) => {
-                  if (name.startsWith('yts-cache')) {
-                    caches.delete(name);
-                  }
-                });
-              });
-            }
-            setRefreshFlag((x) => x + 1);
-          }}>
+          <button className="ctrl-icon" title="Actualizar" onClick={() => setRefreshFlag((x) => x + 1)}>
             <i className="fa-solid fa-rotate-right" />
           </button>
         </div>

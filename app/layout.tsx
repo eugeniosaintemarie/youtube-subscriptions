@@ -46,28 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                  navigator.serviceWorker.register('/sw.js').then((registration) => {
-                    // Check for updates on page load
-                    registration.update();
-                    
-                    // When a new service worker is waiting, reload the page
-                    registration.addEventListener('updatefound', () => {
-                      const newWorker = registration.installing;
-                      if (newWorker) {
-                        newWorker.addEventListener('statechange', () => {
-                          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            // New version available, reload to activate
-                            window.location.reload();
-                          }
-                        });
-                      }
-                    });
-                  }).catch(() => {});
-                  
-                  // Listen for controlling service worker change
-                  navigator.serviceWorker.addEventListener('controllerchange', () => {
-                    window.location.reload();
-                  });
+                  navigator.serviceWorker.register('/sw.js').catch(() => {});
                 });
               }
             `
