@@ -36,12 +36,46 @@ button {
   top: 0;
   z-index: 100;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   padding: 12px 24px;
   background: var(--surface);
   border-bottom: 1px solid var(--line);
   backdrop-filter: blur(12px);
+  transition: transform 0.24s ease, opacity 0.24s ease;
+}
+
+.app-header.hidden {
+  transform: translateY(-110%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.app-header.visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 42px;
+  border-radius: 10px;
+  flex: 0 0 auto;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.brand-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.brand-logo {
+  display: block;
+  width: 24px;
+  height: 43px;
 }
 
 .controls {
@@ -336,6 +370,16 @@ button {
 @media (max-width: 600px) {
   .app-header {
     padding: 12px;
+  }
+
+  .brand-link {
+    width: 24px;
+    height: 38px;
+  }
+
+  .brand-logo {
+    width: 20px;
+    height: 36px;
   }
 
   .main {

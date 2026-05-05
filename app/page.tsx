@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { MouseEvent } from "react";
 import type { AppVideo } from "@/lib/types";
 
 type ApiResponse = {
@@ -15,6 +16,11 @@ type ToastState = {
   text: string;
   kind: "success" | "error";
 };
+
+const YOUTUBE_WEB_URL = "https://www.youtube.com/playlist?list=PLCu_6zERhvNEkhTw19SHuTCQ66vzBvdRr";
+const YOUTUBE_IOS_URL = "youtube://www.youtube.com/playlist?list=PLCu_6zERhvNEkhTw19SHuTCQ66vzBvdRr";
+const YOUTUBE_ANDROID_URL =
+  "intent://www.youtube.com/playlist?list=PLCu_6zERhvNEkhTw19SHuTCQ66vzBvdRr#Intent;package=com.google.android.youtube;scheme=https;end";
 
 const getSeenIds = () => {
   try {
@@ -49,6 +55,17 @@ const clearVideoCache = () => {
   }
 };
 
+const isMobileDevice = () => {
+  if (typeof navigator === "undefined") {
+    return false;
+  }
+
+  const userAgent = navigator.userAgent;
+  const isAndroid = /Android/i.test(userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
+  return isAndroid || isIOS;
+};
+
 export default function HomePage() {
   const [videos, setVideos] = useState<AppVideo[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -61,6 +78,7 @@ export default function HomePage() {
   const [favFilterEnabled, setFavFilterEnabled] = useState(false);
   const [excludeFavEnabled, setExcludeFavEnabled] = useState(false);
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
+  const [isNavbarVisible, setIsNavbarVisible] = useState(true);
 
   const toastTimer = useRef<number | null>(null);
   const longPressTimer = useRef<number | null>(null);
@@ -94,6 +112,26 @@ export default function HomePage() {
   useEffect(() => {
     localStorage.setItem("yts_exclude_fav_enabled", String(excludeFavEnabled));
   }, [excludeFavEnabled]);
+
+  useEffect(() => {
+    let previousScrollY = window.scrollY;
+
+    const onScroll = () => {
+      const currentScrollY = window.scrollY;
+      const isNearTop = currentScrollY < 12;
+      const isScrollingUp = currentScrollY < previousScrollY;
+
+      setIsNavbarVisible(isNearTop || isScrollingUp);
+      previousScrollY = currentScrollY;
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
 
   useEffect(() => {
     let ignore = false;
@@ -290,9 +328,44 @@ export default function HomePage() {
     }
   };
 
+  const openYouTube = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!isMobileDevice()) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const userAgent = navigator.userAgent;
+    const isAndroid = /Android/i.test(userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
+
+    if (isAndroid) {
+      window.location.href = YOUTUBE_ANDROID_URL;
+      return;
+    }
+
+    if (isIOS) {
+      window.location.href = YOUTUBE_IOS_URL;
+      window.setTimeout(() => {
+        window.location.href = YOUTUBE_WEB_URL;
+      }, 1200);
+    }
+  };
+
   return (
     <>
-      <header className="app-header">
+      <header className={`app-header ${isNavbarVisible ? "visible" : "hidden"}`}>
+        <a
+          className="brand-link"
+          href={YOUTUBE_WEB_URL}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Abrir YouTube"
+          onClick={openYouTube}
+        >
+          <img className="brand-logo" src="/youtube-logo.svg" alt="YouTube" width={24} height={43} />
+        </a>
+
         <div className="controls">
           <button
             className={`ctrl-icon ${favFilterEnabled ? "active" : ""}`}
