@@ -60,8 +60,8 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 42px;
+  width: 43px;
+  height: 24px;
   border-radius: 10px;
   flex: 0 0 auto;
   transition: transform 0.2s ease, background 0.2s ease;
@@ -74,8 +74,8 @@ button {
 
 .brand-logo {
   display: block;
-  width: 24px;
-  height: 43px;
+  width: 43px;
+  height: 24px;
 }
 
 .controls {
@@ -373,13 +373,13 @@ button {
   }
 
   .brand-link {
-    width: 24px;
-    height: 38px;
+    width: 38px;
+    height: 21px;
   }
 
   .brand-logo {
-    width: 20px;
-    height: 36px;
+    width: 38px;
+    height: 21px;
   }
 
   .main {

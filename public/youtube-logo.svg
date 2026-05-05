@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 192" role="img" aria-label="YouTube">
-  <rect width="108" height="192" rx="22" fill="#ff0000" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 108" role="img" aria-label="YouTube">
+  <rect width="192" height="108" rx="22" fill="#ff0000" />
   <path
     fill="#ffffff"
-    d="M41 55.5c0-1.4 1.5-2.3 2.8-1.6l51 28.6c1.4.8 1.4 2.8 0 3.6l-51 28.6c-1.3.7-2.8-.2-2.8-1.6V55.5z"
+    d="M74 30.5c0-1.4 1.5-2.3 2.8-1.6l51 28.6c1.4.8 1.4 2.8 0 3.6l-51 28.6c-1.3.7-2.8-.2-2.8-1.6V30.5z"
   />
 </svg>

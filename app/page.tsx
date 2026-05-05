@@ -363,7 +363,7 @@ export default function HomePage() {
           aria-label="Abrir YouTube"
           onClick={openYouTube}
         >
-          <img className="brand-logo" src="/youtube-logo.svg" alt="YouTube" width={24} height={43} />
+          <img className="brand-logo" src="/youtube-logo.svg" alt="YouTube" width={43} height={24} />
         </a>
 
         <div className="controls">
