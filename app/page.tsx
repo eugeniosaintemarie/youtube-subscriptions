@@ -39,6 +39,15 @@ const getCachedVideos = () => {
   }
 };
 
+const isStandalonePwa = () => {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const standaloneNavigator = window.navigator as Navigator & { standalone?: boolean };
+  return window.matchMedia("(display-mode: standalone)").matches || standaloneNavigator.standalone === true;
+};
+
 const setCachedVideos = (data: { videos: AppVideo[]; favorites: string[] }) => {
   try {
     localStorage.setItem("yts_cached_data", JSON.stringify(data));
@@ -140,7 +149,8 @@ export default function HomePage() {
       setIsLoading(true);
 
       try {
-        const response = await fetch(`/api/videos${refreshFlag > 0 ? "?refresh=true" : ""}`, {
+        const shouldRefresh = refreshFlag > 0 || isStandalonePwa();
+        const response = await fetch(`/api/videos${shouldRefresh ? "?refresh=true" : ""}`, {
           cache: "no-store"
         });
 

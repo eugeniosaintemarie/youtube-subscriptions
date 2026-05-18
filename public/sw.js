@@ -1,6 +1,6 @@
 // Service Worker for PWA functionality
-const CACHE_NAME = "yts-cache-v1";
-const STATIC_ASSETS = ["/", "/app/globals.css"];
+const CACHE_NAME = "yts-cache-v2";
+const STATIC_ASSETS = ["/", "/manifest.json", "/favicon.svg", "/apple-touch-icon.svg", "/youtube-logo.svg"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -40,32 +40,34 @@ self.addEventListener("fetch", (event) => {
   }
 
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      if (response) {
-        return response;
-      }
-
-      return fetch(event.request)
-        .then((response) => {
-          // Don't cache non-2xx responses
-          if (!response || response.status !== 200) {
-            return response;
-          }
-
+    fetch(event.request)
+      .then((response) => {
+        if (response && (response.ok || response.type === "opaque")) {
           const responseToCache = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
           });
+        }
 
-          return response;
-        })
-        .catch(() => {
-          // Return a generic offline response if available
-          return new Response("Offline", {
-            status: 503,
-            statusText: "Service Unavailable"
-          });
+        return response;
+      })
+      .catch(async () => {
+        const cachedResponse = await caches.match(event.request);
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+
+        if (event.request.mode === "navigate") {
+          const shell = await caches.match("/");
+          if (shell) {
+            return shell;
+          }
+        }
+
+        return new Response("Offline", {
+          status: 503,
+          statusText: "Service Unavailable"
         });
-    })
+      })
   );
 });
