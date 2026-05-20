@@ -30,40 +30,6 @@ const getSeenIds = () => {
   }
 };
 
-const getCachedVideos = () => {
-  try {
-    const data = localStorage.getItem("yts_cached_data");
-    return data ? JSON.parse(data) : null;
-  } catch {
-    return null;
-  }
-};
-
-const isStandalonePwa = () => {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  const standaloneNavigator = window.navigator as Navigator & { standalone?: boolean };
-  return window.matchMedia("(display-mode: standalone)").matches || standaloneNavigator.standalone === true;
-};
-
-const setCachedVideos = (data: { videos: AppVideo[]; favorites: string[] }) => {
-  try {
-    localStorage.setItem("yts_cached_data", JSON.stringify(data));
-  } catch {
-    // Ignore if localStorage fails
-  }
-};
-
-const clearVideoCache = () => {
-  try {
-    localStorage.removeItem("yts_cached_data");
-  } catch {
-    // Ignore if localStorage fails
-  }
-};
-
 const isMobileDevice = () => {
   if (typeof navigator === "undefined") {
     return false;
@@ -149,8 +115,7 @@ export default function HomePage() {
       setIsLoading(true);
 
       try {
-        const shouldRefresh = refreshFlag > 0 || isStandalonePwa();
-        const response = await fetch(`/api/videos${shouldRefresh ? "?refresh=true" : ""}`, {
+        const response = await fetch("/api/videos", {
           cache: "no-store"
         });
 
@@ -160,51 +125,26 @@ export default function HomePage() {
         }
 
         if (response.status === 401 && data.authRequired) {
-          // Check if we have cached data to show while offline
-          const cached = getCachedVideos();
-          if (cached) {
-            setVideos(cached.videos);
-            setFavorites(cached.favorites);
-            showToast("Usando datos en caché", "success");
-          } else {
-            setAuthRequired(true);
-            setLoginUrl(data.loginUrl ?? "/api/oauth/start");
-            setVideos([]);
-            setFavorites([]);
-          }
+          setAuthRequired(true);
+          setLoginUrl(data.loginUrl ?? "/api/oauth/start");
+          setVideos([]);
+          setFavorites([]);
           setIsLoading(false);
           return;
         }
 
         if (!response.ok) {
-          const cached = getCachedVideos();
-          if (cached) {
-            setVideos(cached.videos);
-            setFavorites(cached.favorites);
-            showToast("Usando datos en caché", "success");
-          } else {
-            showToast(data.error ?? "Error loading videos", "error");
-          }
+          showToast(data.error ?? "Error loading videos", "error");
           setIsLoading(false);
           return;
         }
 
         setAuthRequired(false);
-        const newData = { videos: data.videos ?? [], favorites: data.favorites ?? [] };
-        setVideos(newData.videos);
-        setFavorites(newData.favorites);
-        setCachedVideos(newData);
+        setVideos(data.videos ?? []);
+        setFavorites(data.favorites ?? []);
         setIsLoading(false);
       } catch (error) {
-        // Network error - try to use cached data
-        const cached = getCachedVideos();
-        if (cached) {
-          setVideos(cached.videos);
-          setFavorites(cached.favorites);
-          showToast("Usando datos en caché (sin conexión)", "success");
-        } else {
-          showToast("Error de conexión", "error");
-        }
+        showToast("Error de conexión", "error");
         setIsLoading(false);
       }
     };

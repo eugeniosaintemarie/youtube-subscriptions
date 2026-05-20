@@ -1,28 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFavoriteChannels } from "@/lib/favorites";
-import { getJson, setJson } from "@/lib/kv";
-import { fetchRecentSubscriptionVideos, videosCacheTtlSeconds } from "@/lib/youtube";
+import { fetchRecentSubscriptionVideos } from "@/lib/youtube";
 import type { AppVideo } from "@/lib/types";
 
 type VideosPayload = {
   videos: AppVideo[];
   favorites: string[];
-  cached: boolean;
-  updatedAt: string;
 };
 
-const CACHE_KEY = "single_user:videos_cache";
-
-export async function GET(request: NextRequest) {
-  const forceRefresh = request.nextUrl.searchParams.get("refresh") === "true";
-
-  if (!forceRefresh) {
-    const cached = await getJson<VideosPayload>(CACHE_KEY);
-    if (cached) {
-      return NextResponse.json(cached);
-    }
-  }
-
+export async function GET() {
   try {
     const [videos, favorites] = await Promise.all([
       fetchRecentSubscriptionVideos(),
@@ -31,12 +17,8 @@ export async function GET(request: NextRequest) {
 
     const payload: VideosPayload = {
       videos,
-      favorites,
-      cached: false,
-      updatedAt: new Date().toISOString()
+      favorites
     };
-
-    await setJson(CACHE_KEY, payload, videosCacheTtlSeconds);
 
     return NextResponse.json(payload);
   } catch (error) {
