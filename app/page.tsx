@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { MouseEvent } from "react";
 import type { AppVideo } from "@/lib/types";
 
 type ApiResponse = {
@@ -18,9 +17,19 @@ type ToastState = {
 };
 
 const YOUTUBE_WEB_URL = "https://www.youtube.com/playlist?list=PLCu_6zERhvNEkhTw19SHuTCQ66vzBvdRr";
-const YOUTUBE_IOS_URL = "youtube://www.youtube.com/playlist?list=PLCu_6zERhvNEkhTw19SHuTCQ66vzBvdRr";
-const YOUTUBE_ANDROID_URL =
-  "intent://www.youtube.com/playlist?list=PLCu_6zERhvNEkhTw19SHuTCQ66vzBvdRr#Intent;package=com.google.android.youtube;scheme=https;end";
+const VERCEL_ENV_URL =
+  "https://vercel.com/eugeniosaintemaries-projects/youtube-subscriptions/settings/environment-variables";
+
+function BellIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+      <path
+        d="M12 22a2.25 2.25 0 0 0 2.14-1.55H9.86A2.25 2.25 0 0 0 12 22Zm8-5.75-1.35-1.42a2.25 2.25 0 0 1-.65-1.58V9.8a6.04 6.04 0 0 0-5.17-5.97V3.25a1.75 1.75 0 0 0-3.5 0v.58A6.04 6.04 0 0 0 4.16 9.8v3.45c0 .59-.23 1.16-.65 1.58L2.16 16.25a.75.75 0 0 0 .54 1.25h16.76a.75.75 0 0 0 .54-1.25Zm-2.1-.25H6.1a4.74 4.74 0 0 0 .79-2.75V9.8A4.54 4.54 0 0 1 12 5.25a4.54 4.54 0 0 1 5.11 4.55v3.45c0 .95.27 1.88.79 2.75Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
 
 const getSeenIds = () => {
   try {
@@ -28,17 +37,6 @@ const getSeenIds = () => {
   } catch {
     return new Set<string>();
   }
-};
-
-const isMobileDevice = () => {
-  if (typeof navigator === "undefined") {
-    return false;
-  }
-
-  const userAgent = navigator.userAgent;
-  const isAndroid = /Android/i.test(userAgent);
-  const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
-  return isAndroid || isIOS;
 };
 
 export default function HomePage() {
@@ -278,43 +276,25 @@ export default function HomePage() {
     }
   };
 
-  const openYouTube = (event: MouseEvent<HTMLAnchorElement>) => {
-    if (!isMobileDevice()) {
-      return;
-    }
-
-    event.preventDefault();
-
-    const userAgent = navigator.userAgent;
-    const isAndroid = /Android/i.test(userAgent);
-    const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
-
-    if (isAndroid) {
-      window.location.href = YOUTUBE_ANDROID_URL;
-      return;
-    }
-
-    if (isIOS) {
-      window.location.href = YOUTUBE_IOS_URL;
-      window.setTimeout(() => {
-        window.location.href = YOUTUBE_WEB_URL;
-      }, 1200);
-    }
-  };
-
   return (
     <>
       <header className={`app-header ${isNavbarVisible ? "visible" : "hidden"}`}>
-        <a
-          className="brand-link"
-          href={YOUTUBE_WEB_URL}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Abrir YouTube"
-          onClick={openYouTube}
-        >
-          <img className="brand-logo" src="/youtube-logo.svg" alt="YouTube" width={43} height={24} />
-        </a>
+        <div className="brand-group">
+          <a className="brand-link" href={YOUTUBE_WEB_URL} target="_blank" rel="noopener noreferrer" aria-label="Abrir YouTube">
+            <img className="brand-logo" src="/youtube-logo.svg" alt="YouTube" width={43} height={24} />
+          </a>
+
+          <a
+            className="brand-icon-link"
+            href={VERCEL_ENV_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Abrir variables de entorno en Vercel"
+            title="Variables de entorno"
+          >
+            <BellIcon />
+          </a>
+        </div>
 
         <div className="controls">
           <button
