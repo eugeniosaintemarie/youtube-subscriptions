@@ -10,13 +10,13 @@ A personal web app for browsing recent uploads from your YouTube subscriptions, 
 - Filters videos by favorite channels or hides them entirely.
 - Marks watched videos locally and can dim seen cards in the feed.
 - Saves videos to a private playlist named `0 Watch` with a long-press gesture or a one-tap button.
-- Uses cached data when available so the UI can still render during auth or network issues.
+- Keeps the Google session on the device with an encrypted HttpOnly cookie and fetches fresh videos on every visit.
 
 ### Stack
 
 - Next.js 15 with the App Router and Route Handlers
 - Google OAuth 2.0 and the YouTube Data API v3
-- Vercel KV for OAuth tokens, favorites, and video cache
+- Vercel KV for OAuth state and favorites, plus an encrypted device cookie for Google OAuth tokens
 - Client-side localStorage for UI preferences, seen items, and fallback cache
 
 ### Environment variables
@@ -69,7 +69,7 @@ Open `http://localhost:3000`.
 
 - `GET /api/oauth/start` starts the Google OAuth flow.
 - `GET /api/oauth/callback` handles the OAuth callback and stores tokens.
-- `GET /api/videos` returns recent videos and favorite channels, with a 15 minute cache.
+- `GET /api/videos` returns recent videos and favorite channels, always fetched fresh.
 - `POST /api/watch-later/:videoId` adds a video to the `0 Watch` playlist.
 - `GET /api/favs` returns the current favorites list.
 
@@ -87,13 +87,13 @@ Open `http://localhost:3000`.
 - Permite filtrar por canales favoritos u ocultarlos por completo.
 - Marca localmente los videos vistos y puede atenuar las tarjetas ya vistas.
 - Guarda videos en una playlist privada llamada `0 Watch` con una pulsación larga o un botón de un toque.
-- Usa datos en caché cuando están disponibles, así la interfaz sigue funcionando ante problemas de autenticación o red.
+- Mantiene la sesión de Google en el dispositivo con una cookie HttpOnly cifrada y trae videos frescos en cada visita.
 
 ### Stack
 
 - Next.js 15 con App Router y Route Handlers
 - Google OAuth 2.0 y YouTube Data API v3
-- Vercel KV para tokens OAuth, favoritos y caché de videos
+- Vercel KV para el estado OAuth y favoritos, más una cookie cifrada del dispositivo para los tokens de Google
 - localStorage del navegador para preferencias de UI, vistos y caché de respaldo
 
 ### Variables de entorno
@@ -146,7 +146,7 @@ Abre `http://localhost:3000`.
 
 - `GET /api/oauth/start` inicia el flujo OAuth con Google.
 - `GET /api/oauth/callback` maneja el callback OAuth y guarda los tokens.
-- `GET /api/videos` devuelve los videos recientes y los canales favoritos, con una caché de 15 minutos.
+- `GET /api/videos` devuelve los videos recientes y los canales favoritos, siempre con datos frescos.
 - `POST /api/watch-later/:videoId` agrega un video a la playlist `0 Watch`.
 - `GET /api/favs` devuelve la lista actual de favoritos.
 
