@@ -52,6 +52,8 @@ export default function HomePage() {
   const [excludeFavEnabled, setExcludeFavEnabled] = useState(false);
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
   const [isNavbarVisible, setIsNavbarVisible] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const toastTimer = useRef<number | null>(null);
   const longPressTimer = useRef<number | null>(null);
@@ -105,6 +107,19 @@ export default function HomePage() {
       window.removeEventListener("scroll", onScroll);
     };
   }, []);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
 
   useEffect(() => {
     let ignore = false;
@@ -370,18 +385,32 @@ export default function HomePage() {
               <i className="fa-solid fa-rotate-right" />
             </button>
 
-            <div className="separator" />
+          <div className="separator" />
 
+          <div className="hamburger-wrap" ref={menuRef}>
             <button
               className="ctrl-icon"
-              title="Cerrar sesión"
-              onClick={async () => {
-                await fetch("/api/logout", { method: "POST" });
-                window.location.reload();
-              }}
+              title="Menú"
+              onClick={() => setMenuOpen((prev) => !prev)}
             >
-              <i className="fa-solid fa-right-from-bracket" />
+              <i className="fa-solid fa-bars" />
             </button>
+            {menuOpen ? (
+              <div className="hamburger-dropdown">
+                <button
+                  className="hamburger-item"
+                  onClick={async () => {
+                    setMenuOpen(false);
+                    await fetch("/api/logout", { method: "POST" });
+                    window.location.reload();
+                  }}
+                >
+                  <i className="fa-solid fa-right-from-bracket" />
+                  Logout
+                </button>
+              </div>
+            ) : null}
+          </div>
           </div>
         </header>
       ) : null}
