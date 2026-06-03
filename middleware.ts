@@ -12,7 +12,8 @@ const isBypassedPath = (pathname: string): boolean => {
   return (
     pathname.startsWith("/_next") ||
     pathname === "/favicon.ico" ||
-    pathname.startsWith("/api/oauth/callback")
+    pathname.startsWith("/api/oauth/callback") ||
+    pathname.startsWith("/api/logout")
   );
 };
 
