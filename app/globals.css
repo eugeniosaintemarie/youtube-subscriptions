@@ -473,8 +473,12 @@ button {
 .landing-subtitle {
   font-size: 0.95rem;
   color: var(--muted);
-  margin: 0;
   text-align: center;
+  transition: color 0.2s ease;
+}
+
+.landing-subtitle:hover {
+  color: var(--accent);
 }
 
 .landing-btn {
