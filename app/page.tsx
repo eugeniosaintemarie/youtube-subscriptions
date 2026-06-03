@@ -278,111 +278,113 @@ export default function HomePage() {
 
   return (
     <>
-      <header className={`app-header ${isNavbarVisible ? "visible" : "hidden"}`}>
-        <div className="brand-group">
-          <a className="brand-link" href={YOUTUBE_WEB_URL} target="_blank" rel="noopener noreferrer" aria-label="Abrir YouTube">
-            <img className="brand-logo" src="/youtube-logo.svg" alt="YouTube" width={43} height={24} />
-          </a>
+      {!isLoading && !authRequired ? (
+        <header className={`app-header ${isNavbarVisible ? "visible" : "hidden"}`}>
+          <div className="brand-group">
+            <a className="brand-link" href={YOUTUBE_WEB_URL} target="_blank" rel="noopener noreferrer" aria-label="Abrir YouTube">
+              <img className="brand-logo" src="/youtube-logo.svg" alt="YouTube" width={43} height={24} />
+            </a>
 
-          <a
-            className="brand-icon-link"
-            href={VERCEL_ENV_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Abrir variables de entorno en Vercel"
-            title="Variables de entorno"
-          >
-            <BellIcon />
-          </a>
-        </div>
+            <a
+              className="brand-icon-link"
+              href={VERCEL_ENV_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Abrir variables de entorno en Vercel"
+              title="Variables de entorno"
+            >
+              <BellIcon />
+            </a>
+          </div>
 
-        <div className="controls">
-          <button
-            className={`ctrl-icon ${favFilterEnabled ? "active" : ""}`}
-            title="Solo favoritos"
-            onClick={() => {
-              setFavFilterEnabled((prev) => {
-                const next = !prev;
-                if (next) {
-                  setExcludeFavEnabled(false);
-                }
-                return next;
-              });
-            }}
-          >
-            <i className="fa-solid fa-star" />
-          </button>
-
-          <label className="switch inverted" title="Solo favoritos">
-            <input
-              type="checkbox"
-              checked={favFilterEnabled}
-              onChange={(event) => {
-                const checked = event.target.checked;
-                setFavFilterEnabled(checked);
-                if (checked) {
-                  setExcludeFavEnabled(false);
-                }
+          <div className="controls">
+            <button
+              className={`ctrl-icon ${favFilterEnabled ? "active" : ""}`}
+              title="Solo favoritos"
+              onClick={() => {
+                setFavFilterEnabled((prev) => {
+                  const next = !prev;
+                  if (next) {
+                    setExcludeFavEnabled(false);
+                  }
+                  return next;
+                });
               }}
-            />
-            <span className="slider" />
-          </label>
+            >
+              <i className="fa-solid fa-star" />
+            </button>
 
-          <button
-            className={`ctrl-icon ${excludeFavEnabled ? "active" : ""}`}
-            title="Ocultar favoritos"
-            onClick={() => {
-              setExcludeFavEnabled((prev) => {
-                const next = !prev;
-                if (next) {
-                  setFavFilterEnabled(false);
-                }
-                return next;
-              });
-            }}
-          >
-            <i className="fa-solid fa-eye-slash" />
-          </button>
+            <label className="switch inverted" title="Solo favoritos">
+              <input
+                type="checkbox"
+                checked={favFilterEnabled}
+                onChange={(event) => {
+                  const checked = event.target.checked;
+                  setFavFilterEnabled(checked);
+                  if (checked) {
+                    setExcludeFavEnabled(false);
+                  }
+                }}
+              />
+              <span className="slider" />
+            </label>
 
-          <div className="separator" />
+            <button
+              className={`ctrl-icon ${excludeFavEnabled ? "active" : ""}`}
+              title="Ocultar favoritos"
+              onClick={() => {
+                setExcludeFavEnabled((prev) => {
+                  const next = !prev;
+                  if (next) {
+                    setFavFilterEnabled(false);
+                  }
+                  return next;
+                });
+              }}
+            >
+              <i className="fa-solid fa-eye-slash" />
+            </button>
 
-          <button
-            className={`ctrl-icon ${dimEnabled ? "active" : ""}`}
-            title="Atenuar vistos"
-            onClick={() => setDimEnabled((prev) => !prev)}
-          >
-            <i className="fa-solid fa-circle-half-stroke" />
-          </button>
+            <div className="separator" />
 
-          <label className="switch" title="Atenuar vistos">
-            <input
-              type="checkbox"
-              checked={dimEnabled}
-              onChange={(event) => setDimEnabled(event.target.checked)}
-            />
-            <span className="slider" />
-          </label>
+            <button
+              className={`ctrl-icon ${dimEnabled ? "active" : ""}`}
+              title="Atenuar vistos"
+              onClick={() => setDimEnabled((prev) => !prev)}
+            >
+              <i className="fa-solid fa-circle-half-stroke" />
+            </button>
 
-          <div className="separator" />
+            <label className="switch" title="Atenuar vistos">
+              <input
+                type="checkbox"
+                checked={dimEnabled}
+                onChange={(event) => setDimEnabled(event.target.checked)}
+              />
+              <span className="slider" />
+            </label>
 
-          <button className="ctrl-icon" title="Actualizar" onClick={() => setRefreshFlag((x) => x + 1)}>
-            <i className="fa-solid fa-rotate-right" />
-          </button>
+            <div className="separator" />
 
-          <div className="separator" />
+            <button className="ctrl-icon" title="Actualizar" onClick={() => setRefreshFlag((x) => x + 1)}>
+              <i className="fa-solid fa-rotate-right" />
+            </button>
 
-          <button
-            className="ctrl-icon"
-            title="Cerrar sesión"
-            onClick={async () => {
-              await fetch("/api/logout", { method: "POST" });
-              window.location.reload();
-            }}
-          >
-            <i className="fa-solid fa-right-from-bracket" />
-          </button>
-        </div>
-      </header>
+            <div className="separator" />
+
+            <button
+              className="ctrl-icon"
+              title="Cerrar sesión"
+              onClick={async () => {
+                await fetch("/api/logout", { method: "POST" });
+                window.location.reload();
+              }}
+            >
+              <i className="fa-solid fa-right-from-bracket" />
+            </button>
+          </div>
+        </header>
+      ) : null}
 
       <main className="main">
         {isLoading ? <div className="empty-state">Loading...</div> : null}
