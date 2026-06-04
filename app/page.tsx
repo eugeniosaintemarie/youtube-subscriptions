@@ -300,16 +300,6 @@ export default function HomePage() {
               <img className="brand-logo" src="/youtube-logo.svg" alt="YouTube" width={43} height={24} />
             </a>
 
-            <a
-              className="brand-icon-link"
-              href={VERCEL_ENV_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Abrir variables de entorno en Vercel"
-              title="Variables de entorno"
-            >
-              <BellIcon />
-            </a>
           </div>
 
           <div className="controls">
@@ -397,6 +387,16 @@ export default function HomePage() {
             </button>
             {menuOpen ? (
               <div className="hamburger-dropdown">
+                <a
+                  className="hamburger-item"
+                  href={VERCEL_ENV_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <BellIcon />
+                  Favorites
+                </a>
                 <button
                   className="hamburger-item"
                   onClick={async () => {
