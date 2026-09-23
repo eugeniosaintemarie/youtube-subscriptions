@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { AppVideo } from "@/lib/types";
+import { normalizeChannelName } from "@/lib/channelNames";
 
 type ApiResponse = {
   videos?: AppVideo[];
@@ -181,12 +182,16 @@ export default function HomePage() {
   }, []);
 
   const visibleVideos = useMemo(() => {
+    const favSet = new Set(favorites.map(normalizeChannelName));
+    const isFav = (channelTitle: string) =>
+      favSet.has(normalizeChannelName(channelTitle));
+
     if (favFilterEnabled) {
-      return videos.filter((v) => favorites.includes(v.channelTitle));
+      return videos.filter((v) => isFav(v.channelTitle));
     }
 
     if (excludeFavEnabled) {
-      return videos.filter((v) => !favorites.includes(v.channelTitle));
+      return videos.filter((v) => !isFav(v.channelTitle));
     }
 
     return videos;

@@ -18,7 +18,7 @@ const getEnvFavorites = (): string[] => {
   }
 
   return fromEnv
-    .split(",")
+    .split(/[,\n;]+/)
     .map((item) => item.trim())
     .filter(Boolean);
 };
@@ -34,15 +34,26 @@ const tryReadLegacyFile = async (): Promise<string[]> => {
 };
 
 export async function getFavoriteChannels(): Promise<string[]> {
+  const seeded = getEnvFavorites();
+
+  // FAVORITE_CHANNELS es fuente de verdad: si tiene contenido, prevalece
+  // sobre KV y se re-sincroniza para que cambios en Vercel apliquen
+  // sin tener que borrar la key a mano.
+  if (seeded.length > 0) {
+    const existing = await getJson<string[]>(FAVS_KEY);
+    const same =
+      existing &&
+      existing.length === seeded.length &&
+      existing.every((v, i) => v === seeded[i]);
+    if (!same) {
+      await setJson(FAVS_KEY, seeded);
+    }
+    return seeded;
+  }
+
   const existing = await getJson<string[]>(FAVS_KEY);
   if (existing && existing.length > 0) {
     return existing;
-  }
-
-  const seeded = getEnvFavorites();
-  if (seeded.length > 0) {
-    await setJson(FAVS_KEY, seeded);
-    return seeded;
   }
 
   const fromLegacyFile = await tryReadLegacyFile();
