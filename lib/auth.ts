@@ -85,6 +85,36 @@ const buildAuthCookie = (tokens: StoredTokens) => ({
   maxAge: AUTH_COOKIE_MAX_AGE_SECONDS
 });
 
+async function clearAuthCookie(): Promise<void> {
+  try {
+    const cookieStore = await cookies();
+    cookieStore.set({
+      name: AUTH_COOKIE_NAME,
+      value: "",
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 0
+    });
+  } catch {
+    // Ignore cookie write errors outside request contexts.
+  }
+}
+
+const isInvalidGrantError = (error: unknown): boolean => {
+  if (typeof error === "object" && error !== null) {
+    const response = (error as { response?: { data?: { error?: string; error_description?: string } } })
+      .response;
+    if (response?.data?.error === "invalid_grant") {
+      return true;
+    }
+  }
+
+  const message = error instanceof Error ? error.message : "";
+  return message.includes("invalid_grant");
+};
+
 async function readAuthCookieTokens(): Promise<StoredTokens | null> {
   try {
     const cookieStore = await cookies();
@@ -178,10 +208,25 @@ export async function getValidAccessToken(): Promise<string | null> {
   }
 
   if (!stored.refresh_token) {
+    await clearAuthCookie();
     return null;
   }
 
-  const refreshed = await oauth2Client.refreshAccessToken();
+  let refreshed;
+  try {
+    refreshed = await oauth2Client.refreshAccessToken();
+  } catch (error) {
+    if (isInvalidGrantError(error)) {
+      // Refresh token expired or revoked: drop the stale session so the app
+      // can send the user back to the login screen instead of failing.
+      await deleteKey(TOKENS_KEY);
+      await clearAuthCookie();
+      return null;
+    }
+
+    throw error;
+  }
+
   const nextCredentials = refreshed.credentials;
   const merged: StoredTokens = {
     ...stored,

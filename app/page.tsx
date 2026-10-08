@@ -44,6 +44,7 @@ export default function HomePage() {
   const [videos, setVideos] = useState<AppVideo[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [authRequired, setAuthRequired] = useState(false);
   const [loginUrl, setLoginUrl] = useState("/api/oauth/start");
   const [refreshFlag, setRefreshFlag] = useState(0);
@@ -127,6 +128,7 @@ export default function HomePage() {
 
     const load = async () => {
       setIsLoading(true);
+      setLoadError(null);
 
       try {
         const response = await fetch("/api/videos", {
@@ -138,26 +140,34 @@ export default function HomePage() {
           return;
         }
 
-        if (response.status === 401 && data.authRequired) {
+        if (response.status === 401) {
           setAuthRequired(true);
           setLoginUrl(data.loginUrl ?? "/api/oauth/start");
           setVideos([]);
           setFavorites([]);
+          setLoadError(null);
           setIsLoading(false);
           return;
         }
 
         if (!response.ok) {
+          setAuthRequired(false);
+          setLoadError(data.error ?? "Error loading videos");
           showToast(data.error ?? "Error loading videos", "error");
           setIsLoading(false);
           return;
         }
 
         setAuthRequired(false);
+        setLoadError(null);
         setVideos(data.videos ?? []);
         setFavorites(data.favorites ?? []);
         setIsLoading(false);
       } catch (error) {
+        if (ignore) {
+          return;
+        }
+        setLoadError("Error de conexión");
         showToast("Error de conexión", "error");
         setIsLoading(false);
       }
@@ -444,14 +454,24 @@ export default function HomePage() {
           </div>
         ) : null}
 
-        {!isLoading && !authRequired && visibleVideos.length === 0 ? (
+        {!isLoading && !authRequired && loadError ? (
+          <div className="empty-state">
+            <i className="fa-solid fa-triangle-exclamation" />
+            <p>{loadError}</p>
+            <button className="landing-btn" onClick={() => setRefreshFlag((x) => x + 1)}>
+              Reintentar
+            </button>
+          </div>
+        ) : null}
+
+        {!isLoading && !authRequired && !loadError && visibleVideos.length === 0 ? (
           <div className="empty-state">
             <i className="fa-solid fa-video-slash" />
             <p>No se encontraron videos recientes.</p>
           </div>
         ) : null}
 
-        {!isLoading && !authRequired && visibleVideos.length > 0 ? (
+        {!isLoading && !authRequired && !loadError && visibleVideos.length > 0 ? (
           <section className="grid">
             {visibleVideos.map((video) => {
               const isSeen = seenIds.has(video.id);

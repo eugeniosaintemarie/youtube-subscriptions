@@ -47,6 +47,9 @@ Notes:
 	- `http://localhost:3000/api/oauth/callback`
 	- `https://YOUR_DOMAIN.vercel.app/api/oauth/callback`
 4. Copy the client ID and client secret into `.env.local` or Vercel project variables.
+5. On the OAuth consent screen, click **Publish app** to move it from `Testing` to `In production`.
+
+> **Important:** while the OAuth consent screen is in `Testing`, Google expires refresh tokens after 7 days, so the session dies after a few days and users must log in again. Publishing the app to production removes that 7-day limit, and the encrypted device cookie can keep the session for up to a year.
 
 ### Local development
 
@@ -124,6 +127,9 @@ Notas:
 	- `http://localhost:3000/api/oauth/callback`
 	- `https://TU_DOMINIO.vercel.app/api/oauth/callback`
 4. Copia el client ID y el client secret en `.env.local` o en las variables del proyecto en Vercel.
+5. En la pantalla de consentimiento OAuth, pulsa **Publish app** para pasar de `Testing` a `In production`.
+
+> **Importante:** mientras la pantalla de consentimiento está en `Testing`, Google caduca los refresh tokens a los 7 días, por lo que la sesión muere a los pocos días y hay que iniciar sesión otra vez. Publicar la app en producción elimina ese límite de 7 días y la cookie cifrada del dispositivo puede mantener la sesión hasta un año.
 
 ### Desarrollo local
 
